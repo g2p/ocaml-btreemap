@@ -2,26 +2,18 @@
 extern crate ocaml;
 use ocaml::ToValue;
 
-#[macro_use]
-extern crate lazy_static;
-
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::mem;
 
 struct OCamlString(ocaml::Value);
 
-lazy_static! {
-    static ref COMPARE: ocaml::Value =
-        ocaml::named_value("compare").expect("Callback not registered");
-}
-
 impl Ord for OCamlString {
     fn cmp(&self, other: &Self) -> Ordering {
-        let cr = COMPARE.call2(self.0.clone(), other.0.clone()).unwrap().isize_val();
-        if cr < 0 { return Ordering::Less; }
-        if cr > 0 { return Ordering::Greater; }
-        return Ordering::Equal;
+        // XXX Will segfault if these are not really strings
+        let selfs = ocaml::Str::from(self.0.clone());
+        let others = ocaml::Str::from(other.0.clone());
+        return selfs.as_str().cmp(others.as_str());
     }
 }
 

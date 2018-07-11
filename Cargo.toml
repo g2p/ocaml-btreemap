@@ -8,4 +8,3 @@ crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
 ocaml = "0.3"
-lazy_static = "1"
