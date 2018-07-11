@@ -2,9 +2,9 @@ opam-version: "1.2"
 version: "0.1"
 maintainer: "zachshipko@gmail.com"
 authors: ["Zach Shipko"]
-homepage: "https://github.com/zshipko/ocaml-vec"
-bug-reports: "https://github.com/zshipko/ocaml-vec/issues"
-dev-repo: "https://github.com/zshipko/ocaml-vec.git"
+homepage: "https://github.com/zshipko/ocaml-btreemap"
+bug-reports: "https://github.com/zshipko/ocaml-btreemap/issues"
+dev-repo: "https://github.com/zshipko/ocaml-btreemap.git"
 license: "ISC"
 build: [
     ["cargo" "build" "--release"]

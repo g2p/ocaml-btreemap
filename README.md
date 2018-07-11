@@ -1,6 +1,6 @@
-# ocaml-vec
+# ocaml-btreemap
 
-An [ocaml-rs](https://github.com/zshipko/ocaml-rs) wrapper around the Rust `Vec` type for use in OCaml
+An [ocaml-rs](https://github.com/zshipko/ocaml-rs) wrapper around the Rust `BTreeMap` type for use in OCaml
 
 ## Building
 
@@ -18,10 +18,10 @@ or to build manually:
 
 ## Installation
 
-    opam pin add vec .
+    opam pin add btreemap .
 
 
 ## API
 
-See `src/vec.mli`
+See `src/btreemap.mli`
 

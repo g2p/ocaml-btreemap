@@ -1,17 +1,17 @@
 (jbuild_version 1)
 
 (library
-    ((name vec)
-     (public_name vec)
+    ((name btreemap)
+     (public_name btreemap)
      (wrapped false)
-     (ocamlc_flags (-linkall -dllpath . -dllib -lvec_stubs -cclib -lpthread))
-     (ocamlopt_flags (-linkall -cclib -lvec_stubs -cclib -lpthread))
-     (self_build_stubs_archive (vec))))
+     (ocamlc_flags (-linkall -dllpath . -dllib -lbtreemap_stubs -cclib -lpthread))
+     (ocamlopt_flags (-linkall -cclib -lbtreemap_stubs -cclib -lpthread))
+     (self_build_stubs_archive (btreemap))))
 
 (rule
-    ((targets (libvec_stubs.a))
-     (action (run cp ../../../target/release/libvec_stubs.a libvec_stubs.a))))
+    ((targets (libbtreemap_stubs.a))
+     (action (run cp ../../../target/release/libbtreemap_stubs.a libbtreemap_stubs.a))))
 
 (rule
-    ((targets (dllvec_stubs.so))
-     (action (run cp ../../../target/release/libvec_stubs.so dllvec_stubs.so))))
+    ((targets (dllbtreemap_stubs.so))
+     (action (run cp ../../../target/release/libbtreemap_stubs.so dllbtreemap_stubs.so))))
