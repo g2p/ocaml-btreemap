@@ -126,3 +126,10 @@ caml!(btreemap_max_binding, |handle|, <dest>, {
         }
     });
 } -> dest);
+
+caml!(btreemap_mem, |handle, index|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        dest = ocaml::Value::bool(
+            btreemap.contains_key(&OCamlString(index)));
+    });
+} -> dest);
