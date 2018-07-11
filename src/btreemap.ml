@@ -9,5 +9,7 @@ external mem: ('key, 'a) t -> 'key -> bool = "btreemap_mem"
 external add: ('key, 'a) t -> 'key -> 'a -> unit = "btreemap_add"
 external remove: ('key, 'a) t -> 'key -> unit = "btreemap_remove"
 external iter: ('key, 'a) t -> ('key -> 'a -> unit) -> unit = "btreemap_iter"
+external fold: ('key, 'a) t -> ('key -> 'a -> 'b -> 'b) -> 'b -> 'b = "btreemap_fold"
 external max_binding: ('key, 'a) t -> ('key * 'a) option = "btreemap_max_binding"
+external find_first_opt: ('key, 'a) t -> 'key -> ('key * 'a) option = "btreemap_find_first_opt"
 

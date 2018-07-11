@@ -105,7 +105,8 @@ caml!(btreemap_add, |handle, index, x|, {
 caml!(btreemap_iter, |handle, callback|, {
     load_btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
-            callback.call2(k.0.clone(), v.clone()).expect("Callback failure");
+            callback.call2(k.0.clone(), v.clone())
+                .expect("Callback failure");
         }
     });
 });
@@ -131,5 +132,26 @@ caml!(btreemap_mem, |handle, index|, <dest>, {
     load_btreemap!(handle, btreemap, {
         dest = ocaml::Value::bool(
             btreemap.contains_key(&OCamlString(index)));
+    });
+} -> dest);
+
+caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        for (k, v) in btreemap.iter() {
+            acc = callback.call3(k.0.clone(), v.clone(), acc)
+                .expect("Callback failure");
+        }
+    });
+    dest = acc;
+} -> dest);
+
+caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        if let Some((ref k, ref v)) = btreemap.range(OCamlString(start_inclusive)..).next() {
+            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            dest = ocaml::Value::some(ocaml::Value::from(tuple));
+        } else {
+            dest = ocaml::Value::none();
+        }
     });
 } -> dest);
