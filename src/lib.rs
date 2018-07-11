@@ -109,3 +109,11 @@ caml!(btreemap_add, |handle, index, x|, {
         btreemap.insert(OCamlString(index), x);
     });
 });
+
+caml!(btreemap_iter, |handle, callback|, {
+    load_btreemap!(handle, btreemap, {
+        for (k, v) in btreemap.iter() {
+            callback.call2(k.0.clone(), v.clone()).expect("Callback failure");
+        }
+    });
+});
