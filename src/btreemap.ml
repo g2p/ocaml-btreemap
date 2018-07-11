@@ -6,5 +6,7 @@ external is_empty: ('key, 'a) t -> bool = "btreemap_is_empty"
 external clear: ('key, 'a) t -> unit = "btreemap_clear"
 external find_opt: ('key, 'a) t -> 'key -> 'a option = "btreemap_find_opt"
 external add: ('key, 'a) t -> 'key -> 'a -> unit = "btreemap_add"
+external remove: ('key, 'a) t -> 'key -> unit = "btreemap_remove"
 external iter: ('key, 'a) t -> ('key -> 'a -> unit) -> unit = "btreemap_iter"
+external max_binding: ('key, 'a) t -> ('key * 'a) option = "btreemap_max_binding"
 

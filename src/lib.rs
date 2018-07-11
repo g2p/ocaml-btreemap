@@ -89,7 +89,7 @@ caml!(btreemap_clear, |handle|, {
 caml!(btreemap_find_opt, |handle, index|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some(val) = btreemap.get(&OCamlString(index)) {
-            dest = ocaml::Value::some(val.clone())
+            dest = ocaml::Value::some(val.clone());
         } else {
             dest = ocaml::Value::none();
         }
@@ -109,3 +109,20 @@ caml!(btreemap_iter, |handle, callback|, {
         }
     });
 });
+
+caml!(btreemap_remove, |handle, index|, {
+    modify_btreemap!(handle, btreemap, {
+        btreemap.remove(&OCamlString(index));
+    });
+});
+
+caml!(btreemap_max_binding, |handle|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        if let Some((ref k, ref v)) = btreemap.iter().next_back() {
+            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            dest = ocaml::Value::some(ocaml::Value::from(tuple));
+        } else {
+            dest = ocaml::Value::none();
+        }
+    });
+} -> dest);
