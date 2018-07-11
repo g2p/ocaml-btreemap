@@ -1,3 +1,6 @@
+let () = Callback.register "compare" compare
+let () = Printf.printf "Callback registered\n"
+
 type ('key, 'a) t
 
 external create: unit -> ('key, 'a) t = "btreemap_create"

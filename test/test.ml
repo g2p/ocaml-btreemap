@@ -1,19 +1,24 @@
 let _ =
-    let v = BTreeMap.create 10 in
-    assert (BTreeMap.length v = 0);
-    Printf.printf "%d\n" (BTreeMap.length v);
+    Callback.register "compare" compare;
+    Printf.printf "Callback registered again\n";
+    Printf.eprintf "Callback registered again\n";
+    let m = Btreemap.create () in
+    assert (Btreemap.is_empty m);
+    assert (Btreemap.length m = 0);
+    Printf.printf "%d\n" (Btreemap.length m);
     for i = 1 to 100 do
-        BTreeMap.push v i
+        Btreemap.add m i i
     done;
-    assert (BTreeMap.length v = 100);
-    Printf.printf "%d\n" (BTreeMap.length v);
-    assert BTreeMap.(v.|[0] = Some 1);
-    BTreeMap.(v.|[0] <- 555);
-    assert BTreeMap.(v.|[0] = Some 555);
+    assert (Btreemap.length m = 100);
+    Printf.printf "%d\n" (Btreemap.length m);
+    assert (Btreemap.find_opt m 1 = Some 1);
+    Btreemap.add m 1 555;
+    assert (Btreemap.find_opt m 1 = Some 555);
     for i = 0 to 100 do
-        match BTreeMap.pop v with
-        | Some x -> assert (i < 100); Printf.printf "some %d\n" x
-        | None -> assert (i = 100); print_endline "none"
+        match Btreemap.find_opt m i with
+        | Some x -> assert (i > 0); Printf.printf "some %d\n" x
+        | None -> assert (i = 0); print_endline "none"
     done;
-    BTreeMap.clear v;
-    assert (BTreeMap.length v = 0)
+    Btreemap.clear m;
+    assert (Btreemap.is_empty m);
+    assert (Btreemap.length m = 0);
