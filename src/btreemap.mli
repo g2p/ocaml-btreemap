@@ -1,12 +1,10 @@
-type 'a t
+type ('key, 'a) t
 
-val create: int -> 'a t
-val length: 'a t -> int
-val push: 'a t -> 'a -> unit
-val pop: 'a t -> 'a option
-val clear: 'a t -> unit
-val get: 'a t -> int -> 'a option
-val set: 'a t -> int -> 'a -> unit
+val create: unit -> ('key, 'a) t
+val length: ('key, 'a) t -> int
+val is_empty: ('key, 'a) t -> bool
+val clear: ('key, 'a) t -> unit
+val find_opt: ('key, 'a) t -> 'key -> 'a option
+val add: ('key, 'a) t -> 'key -> 'a -> unit
+val iter: ('key, 'a) t -> ('key -> 'a -> unit) -> unit
 
-val ( .|[] ): 'a t -> int -> 'a option
-val ( .|[]<- ): 'a t -> int -> 'a -> unit
