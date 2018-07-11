@@ -13,7 +13,7 @@ struct OCamlString(ocaml::Value);
 
 lazy_static! {
     static ref COMPARE: ocaml::Value =
-        ocaml::named_value("compare").unwrap();
+        ocaml::named_value("compare").expect("Callback not registered");
 }
 
 impl Ord for OCamlString {
