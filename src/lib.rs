@@ -111,6 +111,17 @@ caml!(btreemap_iter, |handle, callback|, {
     });
 });
 
+caml!(btreemap_exists, |handle, callback|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        let found = btreemap.iter().filter(
+            |(ref k, ref v)|
+                callback.call2(k.0.clone(), (*v).clone())
+                .expect("Callback failure").usize_val() != 0
+            ).next().is_some();
+        dest = ocaml::Value::bool(found);
+    });
+} -> dest);
+
 caml!(btreemap_remove, |handle, index|, {
     modify_btreemap!(handle, btreemap, {
         btreemap.remove(&OCamlString(index));
