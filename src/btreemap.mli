@@ -15,4 +15,5 @@ val fold: ('key, 'a) t -> ('key -> 'a -> 'b -> 'b) -> 'b -> 'b
 val min_binding: ('key, 'a) t -> ('key * 'a) option
 val max_binding: ('key, 'a) t -> ('key * 'a) option
 val find_first_opt: ('key, 'a) t -> 'key -> ('key * 'a) option
+val find_last_opt: ('key, 'a) t -> 'key -> ('key * 'a) option
 

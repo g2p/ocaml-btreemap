@@ -167,6 +167,17 @@ caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
     });
 } -> dest);
 
+caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        if let Some((ref k, ref v)) = btreemap.range(..OCamlString(end_exclusive)).next_back() {
+            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            dest = ocaml::Value::some(ocaml::Value::from(tuple));
+        } else {
+            dest = ocaml::Value::none();
+        }
+    });
+} -> dest);
+
 caml!(btreemap_iter_range,
       |handle, start_inclusive, end_exclusive, callback|,
 {
