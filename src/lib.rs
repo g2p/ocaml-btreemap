@@ -117,6 +117,17 @@ caml!(btreemap_remove, |handle, index|, {
     });
 });
 
+caml!(btreemap_min_binding, |handle|, <dest>, {
+    load_btreemap!(handle, btreemap, {
+        if let Some((ref k, ref v)) = btreemap.iter().next() {
+            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            dest = ocaml::Value::some(ocaml::Value::from(tuple));
+        } else {
+            dest = ocaml::Value::none();
+        }
+    });
+} -> dest);
+
 caml!(btreemap_max_binding, |handle|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next_back() {
@@ -155,3 +166,29 @@ caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
         }
     });
 } -> dest);
+
+caml!(btreemap_iter_range,
+      |handle, start_inclusive, end_exclusive, callback|,
+{
+    load_btreemap!(handle, btreemap, {
+        for (k, v) in btreemap.range(
+            OCamlString(start_inclusive)..OCamlString(end_exclusive))
+        {
+            callback.call2(k.0.clone(), v.clone())
+                .expect("Callback failure");
+        }
+    });
+});
+
+caml!(btreemap_iter_inclusive_range,
+      |handle, start_inclusive, end_inclusive, callback|,
+{
+    load_btreemap!(handle, btreemap, {
+        for (k, v) in btreemap.range(
+            OCamlString(start_inclusive)..=OCamlString(end_inclusive))
+        {
+            callback.call2(k.0.clone(), v.clone())
+                .expect("Callback failure");
+        }
+    });
+});
