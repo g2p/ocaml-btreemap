@@ -1,12 +1,16 @@
+let keys = Hashtbl.create 32
+
 let _ =
-    let n = 100 in
+    let n = 5000 in
     let m = Btreemap.create () in
     print_endline "created";
     assert (Btreemap.is_empty m);
     print_endline "is empty";
     assert (Btreemap.length m = 0);
     for i = 1 to n do
-      Btreemap.add m (string_of_int i) i
+      let t = string_of_int i in
+      Hashtbl.replace keys t i;
+      Btreemap.add m t i
     done;
     Printf.printf "Length: %d\n" (Btreemap.length m);
     assert (Btreemap.length m = n);

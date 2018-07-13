@@ -40,16 +40,7 @@ extern "C" fn finalize(value: ocaml::core::Value) {
     }
 }
 
-macro_rules! load_btreemap {
-    ($v:ident, $btreemap:ident, $block:block) => {
-        let ptr = $v.custom_ptr_val_mut();
-        let $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
-        $block
-        mem::forget($btreemap);
-    }
-}
-
-macro_rules! modify_btreemap {
+macro_rules! btreemap {
     ($v:ident, $btreemap:ident, $block:block) => {
         let ptr = $v.custom_ptr_val_mut();
         let mut $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
@@ -65,25 +56,25 @@ caml!(btreemap_create, |n|, <dest>, {
 } -> dest);
 
 caml!(btreemap_length, |handle|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         dest = ocaml::Value::usize(btreemap.len());
     });
 } -> dest);
 
 caml!(btreemap_is_empty, |handle|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         dest = ocaml::Value::bool(btreemap.is_empty());
     });
 } -> dest);
 
 caml!(btreemap_clear, |handle|, {
-    modify_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         btreemap.clear()
     });
 });
 
 caml!(btreemap_find_opt, |handle, index|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         if let Some(val) = btreemap.get(&OCamlString(index)) {
             dest = ocaml::Value::some(val.clone());
         } else {
@@ -93,13 +84,13 @@ caml!(btreemap_find_opt, |handle, index|, <dest>, {
 } -> dest);
 
 caml!(btreemap_add, |handle, index, x|, {
-    modify_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         btreemap.insert(OCamlString(index), x);
     });
 });
 
 caml!(btreemap_iter, |handle, callback|, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
             callback.call2(k.0.clone(), v.clone())
                 .expect("Callback failure");
@@ -108,7 +99,7 @@ caml!(btreemap_iter, |handle, callback|, {
 });
 
 caml!(btreemap_exists, |handle, callback|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         let found = btreemap.iter().any(
             |(ref k, ref v)| {
                 callback.call2(k.0.clone(), v.0)
@@ -119,13 +110,13 @@ caml!(btreemap_exists, |handle, callback|, <dest>, {
 } -> dest);
 
 caml!(btreemap_remove, |handle, index|, {
-    modify_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         btreemap.remove(&OCamlString(index));
     });
 });
 
 caml!(btreemap_min_binding, |handle|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next() {
             let tuple : ocaml::Tuple = tuple!(k.0, v.0);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
@@ -136,7 +127,7 @@ caml!(btreemap_min_binding, |handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_max_binding, |handle|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next_back() {
             let tuple : ocaml::Tuple = tuple!(k.0, v.0);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
@@ -147,14 +138,14 @@ caml!(btreemap_max_binding, |handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_mem, |handle, index|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         dest = ocaml::Value::bool(
             btreemap.contains_key(&OCamlString(index)));
     });
 } -> dest);
 
 caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
             acc = callback.call3(k.0.clone(), v.clone(), acc)
                 .expect("Callback failure");
@@ -164,7 +155,7 @@ caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
 } -> dest);
 
 caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(OCamlString(start_inclusive)..).next() {
             let tuple : ocaml::Tuple = tuple!(k.0, v.clone());
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
@@ -175,7 +166,7 @@ caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
 } -> dest);
 
 caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(..OCamlString(end_exclusive)).next_back() {
             let tuple : ocaml::Tuple = tuple!(k.0, v.clone());
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
@@ -188,7 +179,7 @@ caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
 caml!(btreemap_iter_range,
       |handle, start_inclusive, end_exclusive, callback|,
 {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             OCamlString(start_inclusive)..OCamlString(end_exclusive))
         {
@@ -201,7 +192,7 @@ caml!(btreemap_iter_range,
 caml!(btreemap_iter_inclusive_range,
       |handle, start_inclusive, end_inclusive, callback|,
 {
-    load_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             OCamlString(start_inclusive)..=OCamlString(end_inclusive))
         {
@@ -245,7 +236,7 @@ caml!(btreemap_split_off_after, |handle, after_key|, <dest>, {
     after_keys.data_mut().copy_from_slice(&split1[..]);
 
     let mut map2;
-    modify_btreemap!(handle, btreemap, {
+    btreemap!(handle, btreemap, {
         map2 = btreemap.split_off(&OCamlString(after_key));
     });
     let ptr = Box::into_raw(Box::new(map2));
