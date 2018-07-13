@@ -34,7 +34,7 @@ impl PartialOrd for OCamlString {
 
 extern "C" fn finalize(value: ocaml::core::Value) {
     let handle = ocaml::Value(value);
-    let ptr = handle.field(0).mut_ptr_val();
+    let ptr = handle.custom_ptr_val_mut::<BTreeMap<OCamlString, ocaml::Value>>();
 
     let btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = unsafe {
         Box::from_raw(ptr)
@@ -45,8 +45,8 @@ extern "C" fn finalize(value: ocaml::core::Value) {
 
 macro_rules! load_btreemap {
     ($v:ident, $btreemap:ident, $block:block) => {
-        let ptr = $v.field(0).mut_ptr_val();
-        let mut $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
+        let ptr = $v.custom_ptr_val_mut();
+        let $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
         $block
         mem::forget($btreemap);
     }
@@ -54,11 +54,9 @@ macro_rules! load_btreemap {
 
 macro_rules! modify_btreemap {
     ($v:ident, $btreemap:ident, $block:block) => {
-        let ptr = $v.field(0).mut_ptr_val();
+        let ptr = $v.custom_ptr_val_mut();
         let mut $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
         $block
-        let new_ptr = Box::into_raw($btreemap);
-        let _ = $v.store_field(0, ocaml::Value::ptr(new_ptr));
     }
 }
 
