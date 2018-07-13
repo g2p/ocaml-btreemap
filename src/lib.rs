@@ -113,11 +113,11 @@ caml!(btreemap_iter, |handle, callback|, {
 
 caml!(btreemap_exists, |handle, callback|, <dest>, {
     load_btreemap!(handle, btreemap, {
-        let found = btreemap.iter().filter(
+        let found = btreemap.iter().any(
             |(ref k, ref v)|
                 callback.call2(k.0.clone(), (*v).clone())
                 .expect("Callback failure").usize_val() != 0
-            ).next().is_some();
+            );
         dest = ocaml::Value::bool(found);
     });
 } -> dest);
