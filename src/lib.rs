@@ -57,6 +57,8 @@ macro_rules! modify_btreemap {
         let ptr = $v.custom_ptr_val_mut();
         let mut $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
         $block
+        let ptr = Box::into_raw($btreemap);
+        $v.set_custom(ptr);
     }
 }
 
