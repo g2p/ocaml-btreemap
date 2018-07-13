@@ -4,7 +4,7 @@ use ocaml::ToValue;
 
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
-use std::mem;
+use std::{mem, ptr};
 
 struct OCamlString(ocaml::Value);
 
@@ -35,12 +35,9 @@ impl PartialOrd for OCamlString {
 extern "C" fn finalize(value: ocaml::core::Value) {
     let handle = ocaml::Value(value);
     let ptr = handle.custom_ptr_val_mut::<BTreeMap<OCamlString, ocaml::Value>>();
-
-    let btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = unsafe {
-        Box::from_raw(ptr)
-    };
-
-    mem::drop(btreemap)
+    unsafe {
+        ptr::drop_in_place(ptr)
+    }
 }
 
 macro_rules! load_btreemap {
@@ -57,12 +54,11 @@ macro_rules! modify_btreemap {
         let ptr = $v.custom_ptr_val_mut();
         let mut $btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::from_raw(ptr);
         $block
-        let ptr = Box::into_raw($btreemap);
-        $v.set_custom(ptr);
+        mem::forget($btreemap);
     }
 }
 
-caml!(btreemap_create, |unit|, <dest>, {
+caml!(btreemap_create, |n|, <dest>, {
     let mut btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::new(BTreeMap::new());
     let ptr = Box::into_raw(btreemap);
     dest = ocaml::Value::alloc_custom(ptr, finalize);
@@ -114,10 +110,10 @@ caml!(btreemap_iter, |handle, callback|, {
 caml!(btreemap_exists, |handle, callback|, <dest>, {
     load_btreemap!(handle, btreemap, {
         let found = btreemap.iter().any(
-            |(ref k, ref v)|
-                callback.call2(k.0.clone(), (*v).clone())
-                .expect("Callback failure").usize_val() != 0
-            );
+            |(ref k, ref v)| {
+                callback.call2(k.0.clone(), v.0)
+                    .expect("Callback failure").usize_val() != 0
+            });
         dest = ocaml::Value::bool(found);
     });
 } -> dest);
@@ -131,7 +127,7 @@ caml!(btreemap_remove, |handle, index|, {
 caml!(btreemap_min_binding, |handle|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next() {
-            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            let tuple : ocaml::Tuple = tuple!(k.0, v.0);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -142,7 +138,7 @@ caml!(btreemap_min_binding, |handle|, <dest>, {
 caml!(btreemap_max_binding, |handle|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next_back() {
-            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            let tuple : ocaml::Tuple = tuple!(k.0, v.0);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -170,7 +166,7 @@ caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
 caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(OCamlString(start_inclusive)..).next() {
-            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            let tuple : ocaml::Tuple = tuple!(k.0, v.clone());
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -181,7 +177,7 @@ caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
 caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
     load_btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(..OCamlString(end_exclusive)).next_back() {
-            let tuple : ocaml::Tuple = tuple!(k.0.clone(), v.clone());
+            let tuple : ocaml::Tuple = tuple!(k.0, v.clone());
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -248,7 +244,7 @@ caml!(btreemap_split_off_after, |handle, after_key|, <dest>, {
     let original = after_keys.data().to_vec();
     after_keys.data_mut().copy_from_slice(&split1[..]);
 
-    let map2;
+    let mut map2;
     modify_btreemap!(handle, btreemap, {
         map2 = btreemap.split_off(&OCamlString(after_key));
     });

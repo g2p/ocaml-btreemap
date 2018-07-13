@@ -3,10 +3,10 @@ build:
 	jbuilder build
 
 test: build
-	jbuilder runtest
+	jbuilder runtest --no-buffer --force
 
 clean:
-	rm -f src/*.a src/*.so
+	rm -f src/*.a src/*.so Cargo.lock
 	cargo clean
 	jbuilder clean
 
