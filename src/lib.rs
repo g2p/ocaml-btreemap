@@ -214,3 +214,45 @@ caml!(btreemap_iter_inclusive_range,
         }
     });
 });
+
+// TODO Get an ocaml::Str -> &[u8] conversion
+// The Rust str API is made for UTF-8, and therefore has some
+// restrictions: no arbitrary data, no reversing
+fn next_key(key: &[u8]) -> Vec<u8> {
+    let mut is_top_key = true;
+    let mut r = key.iter().rev().scan(1, |state, &x| {
+        let r = x.wrapping_add(*state);
+        *state = if r == 0 { 1 } else { 0 };
+        if *state == 0 {
+            is_top_key = false;
+        }
+        Some(r)
+    }).collect::<Vec<_>>();
+    assert!(!is_top_key);
+    r.reverse();
+    return r;
+}
+
+caml!(btreemap_split_off_after, |handle, after_key|, <dest>, {
+    // Compute next_key as an OCamlString
+    // XXX Will segfault if not really an OCaml string
+    let mut after_keys = ocaml::Str::from(after_key.clone());
+    let split1 = next_key(after_keys.data());
+
+    // This is a little bit dirty.
+    // The OCaml bridge doesn't currently provide a way to
+    // construct OCaml strings, so we clone one and update the
+    // data.
+    // Except there's no way to deep clone a string!
+    // So we'll just update it, restore it, hope no one notices.
+    let original = after_keys.data().to_vec();
+    after_keys.data_mut().copy_from_slice(&split1[..]);
+
+    let map2;
+    modify_btreemap!(handle, btreemap, {
+        map2 = btreemap.split_off(&OCamlString(after_key));
+    });
+    let ptr = Box::into_raw(Box::new(map2));
+    dest = ocaml::Value::alloc_custom(ptr, finalize);
+    after_keys.data_mut().copy_from_slice(&original[..]);
+} -> dest);

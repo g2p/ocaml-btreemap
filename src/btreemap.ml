@@ -17,4 +17,5 @@ external min_binding: ('key, 'a) t -> ('key * 'a) option = "btreemap_min_binding
 external max_binding: ('key, 'a) t -> ('key * 'a) option = "btreemap_max_binding"
 external find_first_opt: ('key, 'a) t -> 'key -> ('key * 'a) option = "btreemap_find_first_opt"
 external find_last_opt: ('key, 'a) t -> 'key -> ('key * 'a) option = "btreemap_find_last_opt"
+external split_off_after: ('key, 'a) t -> 'key -> ('key, 'a) t = "btreemap_split_off_after"
 
