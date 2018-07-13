@@ -65,7 +65,7 @@ macro_rules! modify_btreemap {
 caml!(btreemap_create, |unit|, <dest>, {
     let mut btreemap: Box<BTreeMap<OCamlString, ocaml::Value>> = Box::new(BTreeMap::new());
     let ptr = Box::into_raw(btreemap);
-    dest = tuple!(ocaml::Value::ptr(ptr); finalize);
+    dest = ocaml::Value::alloc_custom(ptr, finalize);
 } -> dest);
 
 caml!(btreemap_length, |handle|, <dest>, {
