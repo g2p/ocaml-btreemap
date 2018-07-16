@@ -1,6 +1,6 @@
 # ocaml-btreemap
 
-An [ocaml-rs](https://github.com/zshipko/ocaml-rs) wrapper around the Rust `BTreeMap` type for use in OCaml
+An [ocaml-rs](https://github.com/zshipko/ocaml-rs) wrapper around the Rust [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) type for use in OCaml
 
 ## Building
 
