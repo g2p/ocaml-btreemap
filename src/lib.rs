@@ -85,7 +85,7 @@ caml!(btreemap_find_opt, |handle, index|, <dest>, {
 
 caml!(btreemap_add, |handle, index, x|, {
     btreemap!(handle, btreemap, {
-        btreemap.insert(OCamlString(index), x);
+        btreemap.insert(OCamlString(index.clone()), x);
     });
 });
 
