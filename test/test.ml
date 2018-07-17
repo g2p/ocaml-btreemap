@@ -1,7 +1,7 @@
 let keys = Hashtbl.create 32
 
 let _ =
-    let n = 5000 in
+    let n = 15000 in
     let m = Btreemap.create () in
     print_endline "created";
     assert (Btreemap.is_empty m);
