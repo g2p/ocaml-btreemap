@@ -60,7 +60,7 @@ caml!(btreemap_clear, |handle|, {
     });
 });
 
-caml!(btreemap_find_opt, |handle, index|, <dest>, {
+caml!(btreemap_find_opt, |index, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some(val) = btreemap.get(&str_val_to_vec(index)) {
             dest = ocaml::Value::some(val.clone());
@@ -70,13 +70,13 @@ caml!(btreemap_find_opt, |handle, index|, <dest>, {
     });
 } -> dest);
 
-caml!(btreemap_add, |handle, index, x|, {
+caml!(btreemap_add, |index, x, handle|, {
     btreemap!(handle, btreemap, {
         btreemap.insert(str_val_to_vec(index.clone()), x);
     });
 });
 
-caml!(btreemap_iter, |handle, callback|, {
+caml!(btreemap_iter, |callback, handle|, {
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
             callback.call2(vec_to_str_val(k), v.clone())
@@ -85,7 +85,7 @@ caml!(btreemap_iter, |handle, callback|, {
     });
 });
 
-caml!(btreemap_exists, |handle, callback|, <dest>, {
+caml!(btreemap_exists, |callback, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         let found = btreemap.iter().any(
             |(ref k, v)| {
@@ -96,7 +96,7 @@ caml!(btreemap_exists, |handle, callback|, <dest>, {
     });
 } -> dest);
 
-caml!(btreemap_remove, |handle, index|, {
+caml!(btreemap_remove, |index, handle|, {
     btreemap!(handle, btreemap, {
         btreemap.remove(&str_val_to_vec(index));
     });
@@ -126,14 +126,14 @@ caml!(btreemap_max_binding, |handle|, <dest>, {
     });
 } -> dest);
 
-caml!(btreemap_mem, |handle, index|, <dest>, {
+caml!(btreemap_mem, |index, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         dest = ocaml::Value::bool(
             btreemap.contains_key(&str_val_to_vec(index)));
     });
 } -> dest);
 
-caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
+caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
             acc = callback.call3(vec_to_str_val(k), v.clone(), acc)
@@ -143,7 +143,7 @@ caml!(btreemap_fold, |handle, callback, acc|, <dest>, {
     dest = acc;
 } -> dest);
 
-caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
+caml!(btreemap_find_first_opt, |start_inclusive, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(str_val_to_vec(start_inclusive)..).next() {
             let tuple : ocaml::Tuple = tuple!(vec_to_str_val(k), v.clone());
@@ -154,7 +154,7 @@ caml!(btreemap_find_first_opt, |handle, start_inclusive|, <dest>, {
     });
 } -> dest);
 
-caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
+caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(..str_val_to_vec(end_exclusive)).next_back() {
             let tuple : ocaml::Tuple = tuple!(vec_to_str_val(k), v.clone());
@@ -166,7 +166,7 @@ caml!(btreemap_find_last_opt, |handle, end_exclusive|, <dest>, {
 } -> dest);
 
 caml!(btreemap_iter_range,
-      |handle, start_inclusive, end_exclusive, callback|,
+      |start_inclusive, end_exclusive, callback, handle|,
 {
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
@@ -179,7 +179,7 @@ caml!(btreemap_iter_range,
 });
 
 caml!(btreemap_iter_inclusive_range,
-      |handle, start_inclusive, end_inclusive, callback|,
+      |start_inclusive, end_inclusive, callback, handle|,
 {
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
@@ -191,9 +191,6 @@ caml!(btreemap_iter_inclusive_range,
     });
 });
 
-// TODO Get an ocaml::Str -> &[u8] conversion
-// The Rust str API is made for UTF-8, and therefore has some
-// restrictions: no arbitrary data, no reversing
 fn next_key(key: &[u8]) -> Vec<u8> {
     let mut is_top_key = true;
     let mut r = key.iter().rev().scan(1, |state, &x| {
@@ -209,7 +206,7 @@ fn next_key(key: &[u8]) -> Vec<u8> {
     return r;
 }
 
-caml!(btreemap_split_off_after, |handle, after_key|, <dest>, {
+caml!(btreemap_split_off_after, |after_key, handle|, <dest>, {
     let mut after_keys = ocaml::Str::from(after_key.clone());
     let split1 = next_key(after_keys.data());
 

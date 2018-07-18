@@ -4,18 +4,18 @@ val create: unit -> 'a t
 val length: 'a t -> int
 val is_empty: 'a t -> bool
 val clear: 'a t -> unit
-val find_opt: 'a t -> string -> 'a option
-val mem: 'a t -> string -> bool
-val add: 'a t -> string -> 'a -> unit
-val remove: 'a t -> string -> unit
-val iter: 'a t -> (string -> 'a -> unit) -> unit
-val iter_range: 'a t -> string -> string -> (string -> 'a -> unit) -> unit
-val iter_inclusive_range: 'a t -> string -> string -> (string -> 'a -> unit) -> unit
-val fold: 'a t -> (string -> 'a -> 'b -> 'b) -> 'b -> 'b
-val exists: 'a t -> (string -> 'a -> bool) -> bool
+val find_opt: string -> 'a t -> 'a option
+val mem: string -> 'a t -> bool
+val add: string -> 'a -> 'a t -> unit
+val remove: string -> 'a t -> unit
+val iter: (string -> 'a -> unit) -> 'a t -> unit
+val iter_range: string -> string -> (string -> 'a -> unit) -> 'a t -> unit
+val iter_inclusive_range: string -> string -> (string -> 'a -> unit) -> 'a t -> unit
+val fold: (string -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+val exists: (string -> 'a -> bool) -> 'a t -> bool
 val min_binding: 'a t -> (string * 'a) option
 val max_binding: 'a t -> (string * 'a) option
-val find_first_opt: 'a t -> string -> (string * 'a) option
-val find_last_opt: 'a t -> string -> (string * 'a) option
+val find_first_opt: string -> 'a t -> (string * 'a) option
+val find_last_opt: string -> 'a t -> (string * 'a) option
 val split_off_after: 'a t -> string -> 'a t
 
