@@ -17,5 +17,5 @@ val min_binding: 'a t -> (string * 'a) option
 val max_binding: 'a t -> (string * 'a) option
 val find_first_opt: string -> 'a t -> (string * 'a) option
 val find_last_opt: string -> 'a t -> (string * 'a) option
-val split_off_after: 'a t -> string -> 'a t
+val split_off_after: string -> 'a t -> 'a t
 
