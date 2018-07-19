@@ -10,15 +10,15 @@ let _ =
     for i = 1 to n do
       let t = string_of_int i in
       Hashtbl.replace keys t i;
-      Btreemap.add m t i
+      Btreemap.add t i m
     done;
     Printf.printf "Length: %d\n" (Btreemap.length m);
     assert (Btreemap.length m = n);
-    assert (Btreemap.find_opt m "1" = Some 1);
-    Btreemap.add m "1" 555;
-    assert (Btreemap.find_opt m "1" = Some 555);
+    assert (Btreemap.find_opt "1" m = Some 1);
+    Btreemap.add "1" 555 m;
+    assert (Btreemap.find_opt "1" m = Some 555);
     for i = 0 to n do
-        match Btreemap.find_opt m (string_of_int i) with
+        match Btreemap.find_opt (string_of_int i) m with
         | Some x -> assert (i > 0); Printf.printf "some %d\n%!" x
         | None -> assert (i = 0); print_endline "none"
     done;
