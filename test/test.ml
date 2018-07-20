@@ -22,8 +22,26 @@ let _ =
         | Some x -> assert (i > 0); Printf.printf "some %d\n%!" x
         | None -> assert (i = 0); print_endline "none"
     done;
+    Hashtbl.clear keys;
     Btreemap.clear m;
     assert (Btreemap.is_empty m);
     assert (Btreemap.length m = 0);
     Gc.minor ();
     Gc.full_major ()
+
+let _ =
+  let n = 15000 in
+  let m = Btreemap.create () in
+  for i = 1 to n do
+    let t = string_of_int i in
+    Btreemap.add t (i, i) m;
+  done;
+  for i = 1 to n do
+    let t = string_of_int i in begin
+        match Btreemap.find_opt (string_of_int i) m with
+        | Some (x, y) -> Printf.printf "%d some %d %d\n%!" i x y
+        | None -> print_endline "none"
+      end;
+    assert (Btreemap.find_opt t m = Some (i, i));
+  done;
+
