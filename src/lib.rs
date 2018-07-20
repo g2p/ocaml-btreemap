@@ -76,6 +76,18 @@ caml!(btreemap_add, |index, x, handle|, {
     });
 });
 
+caml!(btreemap_update, |index, x, handle|, {
+    btreemap!(handle, btreemap, {
+        assert!(btreemap.insert(str_val_to_vec(index), x).is_some());
+    });
+});
+
+caml!(btreemap_xadd, |index, x, handle|, {
+    btreemap!(handle, btreemap, {
+        assert!(btreemap.insert(str_val_to_vec(index), x).is_none());
+    });
+});
+
 caml!(btreemap_iter, |callback, handle|, {
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {

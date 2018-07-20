@@ -7,6 +7,10 @@ val clear: 'a t -> unit
 val find_opt: string -> 'a t -> 'a option
 val mem: string -> 'a t -> bool
 val add: string -> 'a -> 'a t -> unit
+(* Like add, but a value must already exist *)
+val update: string -> 'a -> 'a t -> unit
+(* Like add, but a value cannot already exist *)
+val xadd: string -> 'a -> 'a t -> unit
 val remove: string -> 'a t -> unit
 val iter: (string -> 'a -> unit) -> 'a t -> unit
 val iter_range: string -> string -> (string -> 'a -> unit) -> 'a t -> unit
