@@ -63,7 +63,9 @@ caml!(btreemap_clear, |handle|, {
 caml!(btreemap_find_opt, |index, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some(val) = btreemap.get(&str_val_to_vec(index)) {
-            dest = ocaml::Value::some(val.deep_clone_to_ocaml());
+            caml_local!(v1);
+            v1 = val.deep_clone_to_ocaml();
+            dest = ocaml::Value::some(v1);
         } else {
             dest = ocaml::Value::none();
         }
@@ -89,10 +91,12 @@ caml!(btreemap_xadd, |index, x, handle|, {
 });
 
 caml!(btreemap_iter, |callback, handle|, {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
-            callback.call2(vec_to_str_val(k), v.deep_clone_to_ocaml())
-                .expect("Callback failure");
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            callback.call2_exn(k1, v1).expect("Callback failure");
         }
     });
 });
@@ -101,7 +105,10 @@ caml!(btreemap_exists, |callback, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         let found = btreemap.iter().any(
             |(ref k, v)| {
-                callback.call2(vec_to_str_val(k), v.deep_clone_to_ocaml())
+                caml_local!(k1, v1);
+                k1 = vec_to_str_val(k);
+                v1 = v.deep_clone_to_ocaml();
+                callback.call2(k1, v1)
                     .expect("Callback failure").usize_val() != 0
             });
         dest = ocaml::Value::bool(found);
@@ -117,8 +124,10 @@ caml!(btreemap_remove, |index, handle|, {
 caml!(btreemap_min_binding, |handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next() {
-            let tuple : ocaml::Tuple = tuple!(
-                vec_to_str_val(k), v.deep_clone_to_ocaml());
+            caml_local!(k1, v1, tuple);
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            let tuple : ocaml::Tuple = tuple!(k1, v1);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -129,8 +138,10 @@ caml!(btreemap_min_binding, |handle|, <dest>, {
 caml!(btreemap_max_binding, |handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.iter().next_back() {
-            let tuple : ocaml::Tuple = tuple!(
-                vec_to_str_val(k), v.deep_clone_to_ocaml());
+            caml_local!(k1, v1, tuple);
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            let tuple : ocaml::Tuple = tuple!(k1, v1);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -146,19 +157,25 @@ caml!(btreemap_mem, |index, handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
+    caml_local!(k1, v1, acc1);
+    acc1 = acc;
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
-            acc = callback.call3(vec_to_str_val(k), v.deep_clone_to_ocaml(), acc)
-                .expect("Callback failure");
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            acc1 = callback.call3(k1, v1, acc1).expect("Callback failure");
         }
     });
-    dest = acc;
+    dest = acc1;
 } -> dest);
 
 caml!(btreemap_find_first_opt, |start_inclusive, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(str_val_to_vec(start_inclusive)..).next() {
-            let tuple : ocaml::Tuple = tuple!(vec_to_str_val(k), v.deep_clone_to_ocaml());
+            caml_local!(k1, v1, tuple);
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            let tuple : ocaml::Tuple = tuple!(k1, v1);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -169,7 +186,10 @@ caml!(btreemap_find_first_opt, |start_inclusive, handle|, <dest>, {
 caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
     btreemap!(handle, btreemap, {
         if let Some((ref k, ref v)) = btreemap.range(..str_val_to_vec(end_exclusive)).next_back() {
-            let tuple : ocaml::Tuple = tuple!(vec_to_str_val(k), v.deep_clone_to_ocaml());
+            caml_local!(k1, v1, tuple);
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            let tuple : ocaml::Tuple = tuple!(k1, v1);
             dest = ocaml::Value::some(ocaml::Value::from(tuple));
         } else {
             dest = ocaml::Value::none();
@@ -180,12 +200,14 @@ caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
 caml!(btreemap_iter_range,
       |start_inclusive, end_exclusive, callback, handle|,
 {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..str_val_to_vec(end_exclusive))
         {
-            callback.call2(vec_to_str_val(k), v.deep_clone_to_ocaml())
-                .expect("Callback failure");
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            callback.call2(k1, v1).expect("Callback failure");
         }
     });
 });
@@ -193,12 +215,14 @@ caml!(btreemap_iter_range,
 caml!(btreemap_iter_inclusive_range,
       |start_inclusive, end_inclusive, callback, handle|,
 {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..=str_val_to_vec(end_inclusive))
         {
-            callback.call2(vec_to_str_val(k), v.deep_clone_to_ocaml())
-                .expect("Callback failure");
+            k1 = vec_to_str_val(k);
+            v1 = v.deep_clone_to_ocaml();
+            callback.call2(k1, v1).expect("Callback failure");
         }
     });
 });
