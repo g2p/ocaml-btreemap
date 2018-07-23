@@ -44,4 +44,6 @@ let _ =
       end;
     assert (Btreemap.find_opt t m = Some (i, i));
   done;
+  Btreemap.iter (fun k (v1, v2) ->
+      Printf.printf "%s -> (%d, %d)\n" k v1 v2) m;
 
