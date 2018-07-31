@@ -22,8 +22,14 @@ let _ =
         | Some x -> assert (i > 0); Printf.printf "some %d\n%!" x
         | None -> assert (i = 0); print_endline "none"
     done;
+    let m2 = Btreemap.create () in
+    Btreemap.iter (fun k v ->
+        Printf.printf "%s -> %Ld\n" k v;
+        Btreemap.add k v m2;
+      ) m;
     Hashtbl.clear keys;
     Btreemap.clear m;
+    Btreemap.clear m2;
     assert (Btreemap.is_empty m);
     assert (Btreemap.length m = 0);
     Gc.minor ();
