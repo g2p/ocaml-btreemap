@@ -26,7 +26,9 @@ let _ =
     let m2 = Btreemap.create () in
     Btreemap.iter (fun k v ->
         Printf.printf "%s -> %Ld\n" k v;
-        Btreemap.add k v m2;
+        (*Btreemap.add k v m2;*)
+        Gc.minor ();
+        Gc.full_major ();
       ) m;
     Hashtbl.clear keys;
     Btreemap.clear m;
