@@ -9,17 +9,18 @@ let _ =
     assert (Btreemap.length m = 0);
     for i = 1 to n do
       let t = string_of_int i in
-      Hashtbl.replace keys t i;
-      Btreemap.add t i m
+      let l = Int64.of_int i in
+      Hashtbl.replace keys t l;
+      Btreemap.add t l m
     done;
     Printf.printf "Length: %d\n" (Btreemap.length m);
     assert (Btreemap.length m = n);
-    assert (Btreemap.find_opt "1" m = Some 1);
-    Btreemap.add "1" 555 m;
-    assert (Btreemap.find_opt "1" m = Some 555);
+    assert (Btreemap.find_opt "1" m = Some 1L);
+    Btreemap.add "1" 555L m;
+    assert (Btreemap.find_opt "1" m = Some 555L);
     for i = 0 to n do
         match Btreemap.find_opt (string_of_int i) m with
-        | Some x -> assert (i > 0); Printf.printf "some %d\n%!" x
+        | Some x -> assert (i > 0); Printf.printf "some %Ld\n%!" x
         | None -> assert (i = 0); print_endline "none"
     done;
     let m2 = Btreemap.create () in
@@ -35,6 +36,7 @@ let _ =
     Gc.minor ();
     Gc.full_major ()
 
+(*
 let _ =
   let n = 15000 in
   let m = Btreemap.create () in
@@ -52,4 +54,5 @@ let _ =
   done;
   Btreemap.iter (fun k (v1, v2) ->
       Printf.printf "%s -> (%d, %d)\n" k v1 v2) m;
+   *)
 
