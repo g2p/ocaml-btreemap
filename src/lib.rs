@@ -101,9 +101,9 @@ caml!(btreemap_xadd, |index, x, handle|, {
 });
 
 caml!(btreemap_iter, |callback, handle|, {
-    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
+            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2_exn(k1, v1).expect("Callback failure");
@@ -167,10 +167,11 @@ caml!(btreemap_mem, |index, handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
-    caml_local!(k1, v1, acc1);
+    caml_local!(acc1);
     acc1 = acc;
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
+            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             acc1 = callback.call3(k1, v1, acc1).expect("Callback failure");
@@ -210,11 +211,11 @@ caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
 caml!(btreemap_iter_range,
       |start_inclusive, end_exclusive, callback, handle|,
 {
-    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..str_val_to_vec(end_exclusive))
         {
+            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2(k1, v1).expect("Callback failure");
@@ -225,11 +226,11 @@ caml!(btreemap_iter_range,
 caml!(btreemap_iter_inclusive_range,
       |start_inclusive, end_inclusive, callback, handle|,
 {
-    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..=str_val_to_vec(end_inclusive))
         {
+            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2(k1, v1).expect("Callback failure");
