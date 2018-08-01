@@ -121,7 +121,7 @@ caml!(btreemap_exists, |callback, handle|, <dest>, {
                 caml_local!(k1, v1);
                 k1 = vec_to_str_val(k);
                 v1 = u64_to_val(*v);
-                callback.call2(k1, v1)
+                callback.call2_exn(k1, v1)
                     .expect("Callback failure").usize_val() != 0
             });
         dest = ocaml::Value::bool(found);
@@ -176,7 +176,7 @@ caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
         for (k, v) in btreemap.iter() {
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
-            acc1 = callback.call3(k1, v1, acc1).expect("Callback failure");
+            acc1 = callback.call3_exn(k1, v1, acc1).expect("Callback failure");
         }
     });
     dest = acc1;
@@ -220,7 +220,7 @@ caml!(btreemap_iter_range,
         {
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
-            callback.call2(k1, v1).expect("Callback failure");
+            callback.call2_exn(k1, v1).expect("Callback failure");
         }
     });
 });
@@ -235,7 +235,7 @@ caml!(btreemap_iter_inclusive_range,
         {
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
-            callback.call2(k1, v1).expect("Callback failure");
+            callback.call2_exn(k1, v1).expect("Callback failure");
         }
     });
 });
