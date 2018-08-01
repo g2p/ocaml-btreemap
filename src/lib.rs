@@ -104,8 +104,11 @@ caml!(btreemap_iter, |callback, handle|, {
     caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
+            eprintln!("Callback tag {:?} A", callback.tag());
             k1 = vec_to_str_val(k);
+            eprintln!("Callback tag {:?} B", callback.tag());
             v1 = u64_to_val(*v);
+            eprintln!("Callback tag {:?} C", callback.tag());
             callback.call2_exn(k1, v1).expect("Callback failure");
         }
     });
