@@ -71,9 +71,9 @@ caml!(btreemap_clear, |handle|, {
 });
 
 caml!(btreemap_find_opt, |index, handle|, <dest>, {
+    caml_local!(v1);
     btreemap!(handle, btreemap, {
         if let Some(v) = btreemap.get(&str_val_to_vec(index)) {
-            caml_local!(v1);
             v1 = u64_to_val(*v);
             dest = ocaml::Value::some(v1);
         } else {
@@ -101,9 +101,9 @@ caml!(btreemap_xadd, |index, x, handle|, {
 });
 
 caml!(btreemap_iter, |callback, handle|, {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
-            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2_exn(k1, v1).expect("Callback failure");
@@ -132,9 +132,9 @@ caml!(btreemap_remove, |index, handle|, {
 });
 
 caml!(btreemap_min_binding, |handle|, <dest>, {
+    caml_local!(k1, v1, tuple);
     btreemap!(handle, btreemap, {
         if let Some((ref k, v)) = btreemap.iter().next() {
-            caml_local!(k1, v1, tuple);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             let tuple : ocaml::Tuple = tuple!(k1, v1);
@@ -146,9 +146,9 @@ caml!(btreemap_min_binding, |handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_max_binding, |handle|, <dest>, {
+    caml_local!(k1, v1, tuple);
     btreemap!(handle, btreemap, {
         if let Some((ref k, v)) = btreemap.iter().next_back() {
-            caml_local!(k1, v1, tuple);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             let tuple : ocaml::Tuple = tuple!(k1, v1);
@@ -167,11 +167,10 @@ caml!(btreemap_mem, |index, handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
-    caml_local!(acc1);
+    caml_local!(acc1, k1, v1);
     acc1 = acc;
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.iter() {
-            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             acc1 = callback.call3(k1, v1, acc1).expect("Callback failure");
@@ -181,9 +180,9 @@ caml!(btreemap_fold, |callback, handle, acc|, <dest>, {
 } -> dest);
 
 caml!(btreemap_find_first_opt, |start_inclusive, handle|, <dest>, {
+    caml_local!(k1, v1, tuple);
     btreemap!(handle, btreemap, {
         if let Some((ref k, v)) = btreemap.range(str_val_to_vec(start_inclusive)..).next() {
-            caml_local!(k1, v1, tuple);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             let tuple : ocaml::Tuple = tuple!(k1, v1);
@@ -195,9 +194,9 @@ caml!(btreemap_find_first_opt, |start_inclusive, handle|, <dest>, {
 } -> dest);
 
 caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
+    caml_local!(k1, v1, tuple);
     btreemap!(handle, btreemap, {
         if let Some((ref k, v)) = btreemap.range(..str_val_to_vec(end_exclusive)).next_back() {
-            caml_local!(k1, v1, tuple);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             let tuple : ocaml::Tuple = tuple!(k1, v1);
@@ -211,11 +210,11 @@ caml!(btreemap_find_last_opt, |end_exclusive, handle|, <dest>, {
 caml!(btreemap_iter_range,
       |start_inclusive, end_exclusive, callback, handle|,
 {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..str_val_to_vec(end_exclusive))
         {
-            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2(k1, v1).expect("Callback failure");
@@ -226,11 +225,11 @@ caml!(btreemap_iter_range,
 caml!(btreemap_iter_inclusive_range,
       |start_inclusive, end_inclusive, callback, handle|,
 {
+    caml_local!(k1, v1);
     btreemap!(handle, btreemap, {
         for (k, v) in btreemap.range(
             str_val_to_vec(start_inclusive)..=str_val_to_vec(end_inclusive))
         {
-            caml_local!(k1, v1);
             k1 = vec_to_str_val(k);
             v1 = u64_to_val(*v);
             callback.call2(k1, v1).expect("Callback failure");
