@@ -5,6 +5,9 @@ authors = [
     "Zach Shipko <zachshipko@gmail.com>",
     "Gabriel de Perthuis <g2p.code@gmail.com>"]
 
+[profile.release]
+debug = true
+
 [lib]
 crate-type = ["staticlib", "cdylib"]
 
