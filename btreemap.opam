@@ -7,6 +7,6 @@ bug-reports: "https://github.com/zshipko/ocaml-btreemap/issues"
 dev-repo: "https://github.com/zshipko/ocaml-btreemap.git"
 license: "ISC"
 build: [
-    ["cargo" "build" "--release"]
+    ["cargo" "build"]
     ["jbuilder" "build"]
 ]

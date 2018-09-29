@@ -1,5 +1,5 @@
 build:
-	cargo build --release
+	cargo build
 	jbuilder build
 
 test: build

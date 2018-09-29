@@ -10,8 +10,8 @@
 
 (rule
     ((targets (libbtreemap_stubs.a))
-     (action (run cp ../../../target/release/libbtreemap_stubs.a libbtreemap_stubs.a))))
+     (action (run cp ../../../target/debug/libbtreemap_stubs.a libbtreemap_stubs.a))))
 
 (rule
     ((targets (dllbtreemap_stubs.so))
-     (action (run cp ../../../target/release/libbtreemap_stubs.so dllbtreemap_stubs.so))))
+     (action (run cp ../../../target/debug/libbtreemap_stubs.so dllbtreemap_stubs.so))))
